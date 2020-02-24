@@ -1,8 +1,8 @@
 # chatapp
 ---
 #TOC
-- [] 0. Files Tree
-- [] 1. Setting thins up!
+- [x] 0. Files Tree
+- [x] 1. Setting thins up!
 ---
 0. Files Tree:
 
