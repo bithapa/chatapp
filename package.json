@@ -1,0 +1,27 @@
+{
+  "name": "chatapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bithapa/chatapp.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bithapa/chatapp/issues"
+  },
+  "homepage": "https://github.com/bithapa/chatapp#readme",
+  "dependencies": {
+    "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.7"
+  }
+}
