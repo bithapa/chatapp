@@ -1,10 +1,10 @@
 # chatapp
 ---
-#TOC
+## TOC
 - [x] 0. Files Tree
 - [x] 1. Setting thins up!
 ---
-0. Files Tree:
+# 0. Files Tree:
 
 ```
     chatapp
