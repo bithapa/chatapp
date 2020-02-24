@@ -3,6 +3,7 @@
 ## TOC
 - [x] 0. Files Tree
 - [x] 1. Setting thins up!
+- [x] 2. WebSockets: Full Duplex Communication
 ---
 # 0. Files Tree:
 
@@ -80,6 +81,54 @@ In `chatapp/package.json`:
 
 ```
     Commands:
-                    to run the project: npm run start
-            to run in development mode: npm run dev
+                    to run the project:     npm run start
+            to run in development mode:     npm run dev
+
+```
+
+# 2. WebSockets: Full Duplex Communication
+- bidirectional communication between the client and the server
+- webSocket protocol is different from http
+- persistent connection between the client and the server
+
+- install `socket.io`: `npm i socket.io@2.2.0`
+- In `src/index.js`
+```javascript
+    const http = require('http')            // enables http protocol
+    const socketio = require('socket.io')   // enable webSocket protocol
+    ...
+    const app = express()
+    const server = http.createServer('app') // create server using http
+    const io = socketio(server)             // use http server with socket.io
+    ...
+    // print sth with socket
+    // io.on(e, f) : function f runs when event e occurs
+    io.on('connection', () => {
+        console.log(`message from webSocket connection!`)
+    })  // this requires the connection of the server to the client side
+        // connect socket.io in public/index.html
+
+    server.listen(port, () => {
+        console.log(`Server is up on port ${port}!`)
+    })
+```
+
+- Server-Client connection for webSocket:
+    - in `public/index.html`
+```html
+    ...
+    Chat App!
+
+    // client side version of the library for socket connection
+    // make a client side JS file and use the libraries provided <body>
+    // the following script
+    </body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/chat.js"></script>
+    ...
+```
+- Create `public/js/chat.js` and load the script
+```
+    // public/js/chat.js
+    io()    // provided by the socket.io script in the index.html
 ```
