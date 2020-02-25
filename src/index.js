@@ -21,6 +21,7 @@ io.on('connection', (socket) => {
     console.log(`Message from Socket connection!`)
 
     socket.emit('message', 'Welcome! Client CONNECTED!')
+    socket.broadcast.emit('message', 'A new user has joined.')
 
     socket.on('sendMessage', (msg) => {
         io.emit('message', msg)

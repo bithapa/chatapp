@@ -5,6 +5,7 @@
 - [x] 1. Setting thins up!
 - [x] 2. WebSockets: Full Duplex Communication
 - [x] 3. Socket.io Events
+- [x] 4. Broadcasting Events
 ---
 # 0. Files Tree:
 
@@ -210,4 +211,20 @@ In `chatapp/package.json`:
         })
     })
     ...
+```
+# 4. Broadcasting Events
+- `broadcast` helps integrate the status of the users
+- send a message `A new user has joined.` to everyone except the one that just joined
+```javascript
+    ...
+    socket.emit('message', 'Welcome! Client CONNECTED!')
+    socket.broadcast.emit('message', 'A new user has joined.')
+    ...
+```
+- So far, we have three ways to emit the event from the server:
+```
+                socket.emit: to emit the event to the particular connection,
+      socket.broadcast.emit: to emit to everyone except itself
+                    io.emit: to emit to everyone
+
 ```
