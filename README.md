@@ -6,6 +6,7 @@
 - [x] 2. WebSockets: Full Duplex Communication
 - [x] 3. Socket.io Events
 - [x] 4. Broadcasting Events
+- [x] 5. Sharing Location: MDN Geolocation API
 ---
 # 0. Files Tree:
 
@@ -249,3 +250,56 @@ In `chatapp/package.json`:
             io.emit('message', 'A user has left.')
         })
     })
+```
+# 5. Sharing Location: MDN Geolocation API
+- First, create a button
+```html
+// public/index.html
+...
+    <h1>
+        Chat App!
+    </h1>
+    <form id="message-form">
+        <input name="msg" placeholder="message" />
+        <button>Send</button>
+    </form>
+    <button id="send-location">Send Location</button>
+...
+```
+- Next, add the event 'click' in client-side for this button
+
+```javascript
+// public/chat.js
+...
+    document.querySelector("#send-location").addEventListener('click', () => {
+        // make sure that browser supports Geolocation
+        if ( !navigator.geolocation ) {
+            return alert('Your browser does not support Geolocation service.')
+        }
+
+        // get the user's Location
+        navigator.geolocation.getCurrentPosition( (position) => {
+            console.log(position)
+        })
+    })
+```
+- Now, create an event 'sendLocation' and render the location in the browser, note that the event here is emitted inside the `navigator.geolocation.getCurrentPosition` function. This function is provided by [MDN Geolocation API](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API).
+```javascript
+// public/js/chat.js
+    ...
+    navigator.geolocation.getCurrentPosition( (pos) => {
+        console.log(position)
+        socket.emit('sendLocation', {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude
+        })
+    })
+```
+- Make sure that the event is received by the server
+```javascript
+// index.js
+    ...
+    socket.on('sendLocation', (position) => {
+        io.emit('message', `Location: ${position.latitude}, ${position.longitude}`)
+    })
+```
