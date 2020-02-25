@@ -500,3 +500,41 @@ We now instead want to render this link.
     2. Moment
     3. QS
 - import the libraries on index.html
+
+```html
+    <!-- /public/index.html -->
+    ...
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/chat.js"></script>
+</body>
+</html>
+```
+- Define a message rendering template in `index.html`
+```html
+    <!-- index.html -->
+    <div id="messages"></div>
+    ...
+    <script id="message-template" type="text/html">
+        <p>{{message}}<p>
+    </script>
+```
+- render the message: you need
+    - the template
+    - the place where you render the message (in our case `<div id="messages">`)
+    - render inside the `'message'` event
+    - note that `innerHTML` tag in `messageTemplate` is important in order to get the html content of the template
+```javascript
+    // chat.js
+    ...
+    const $messages = document.querySelector('#messages') // grab the div
+    const messageTemplate = document.querySelector('#message-template').innerHTML // grab the template
+
+    socket.on('message', (msg) => {
+        ...
+        const html = Mustache.render(messageTemplate, {message: msg})
+        $messages.insertAdjacentHTML('beforeend', html)
+    })
+```
