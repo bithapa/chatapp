@@ -4,6 +4,7 @@
 - [x] 0. Files Tree
 - [x] 1. Setting thins up!
 - [x] 2. WebSockets: Full Duplex Communication
+- [x] 3. Socket.io Events
 ---
 # 0. Files Tree:
 
@@ -85,7 +86,7 @@ In `chatapp/package.json`:
             to run in development mode:     npm run dev
 
 ```
-
+---
 # 2. WebSockets: Full Duplex Communication
 - bidirectional communication between the client and the server
 - webSocket protocol is different from http
@@ -98,7 +99,7 @@ In `chatapp/package.json`:
     const socketio = require('socket.io')   // enable webSocket protocol
     ...
     const app = express()
-    const server = http.createServer('app') // create server using http
+    const server = http.createServer(app) // create server using http
     const io = socketio(server)             // use http server with socket.io
     ...
     // print sth with socket
@@ -120,7 +121,7 @@ In `chatapp/package.json`:
     Chat App!
 
     // client side version of the library for socket connection
-    // make a client side JS file and use the libraries provided <body>
+    // make a client side JS file and use the libraries provided by
     // the following script
     </body>
     <script src="/socket.io/socket.io.js"></script>
@@ -131,4 +132,82 @@ In `chatapp/package.json`:
 ```
     // public/js/chat.js
     io()    // provided by the socket.io script in the index.html
+```
+---
+# 3. Socket.io Events
+??? *need to study more on this*
+- when some events occurs (for eg. 'connection') either on client side or on server side, we can ask socket to run certain task (for eg. sending a message)
+    - emit a message from a server side `on` 'connection' (when new client connects),
+    - have that message displayed on the client side (have client listen the event)
+
+```javascript
+    // src/index.js
+    ...
+    io.on('connection', (socket) => {
+        console.log('Message from webSocket connection!')
+
+        // when the event 'message' occurs 'Welcome!' message is sent
+        socket.emit('message', 'Welcome!')
+    })
+    ...
+```
+
+```javascript
+    // public/js/chat.js
+    const socket = io()
+    // when the 'message' event occurs the function is executed that takes the message param
+    socket.on('message', (message) => {
+        console.log(message)
+    })
+```
+
+- Now, create a form to get the input message and have that rendered on console
+```html
+    <!--public/index.html-->
+    ...
+    Chat App!
+    <form id="message-form">
+        <input placeholder="message"></input>
+        <button>Send<button>
+    </form>
+    ...
+```
+- once the form is submitted, 'submit' event occurs (note, not explicitly mentioned in index.html); we need to grab that event from the client side
+- Next, emit the event called 'sendMessage' with the input string
+```javascript
+    // public/chat.js
+    const socket = io()
+
+    socket.on('message', (message) => {
+        console.log(message)
+    })
+
+    // access the form using id and add the submit event
+    // e is a default event argument  
+    document.querySelector('#message-form').addEventListener('submit', (e) ={
+        e.preventDefault() // prevent full page refresh
+
+    // grab the input string
+    // const message = document.querySelector('input').value
+    // this (grabbed by name tag) is less likely to break than querySelector
+        const message = e.target.elements.msg.value
+    // emit the event with the input message
+        socket.emit('sendMessage', message)
+    // make sure that the event 'sendMessage' is received in the server side
+    })
+```
+- Receive the event 'sendMessage' in the server side
+```javascript
+    ...
+    io.on('connection', (socket) => {
+        console.log(`Message from Socket connection!`)
+
+        socket.emit('message', 'Welcome! Client CONNECTED!')
+
+        // msg here is the message from the client-side event sendMessage
+        io.on('sendMessage', (msg) => {
+            socket.emit('message', msg)
+        })
+    })
+    ...
 ```
