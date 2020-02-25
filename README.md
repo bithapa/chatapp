@@ -465,3 +465,29 @@ We now instead want to render this link.
         })
     })
 ```
+- Now, do the same thing for the event 'sendLocation'. Note that there is only one element for '#send-location (why?)'.
+```
+    disable:
+        document.querySelector('#send-location').setAttribute('disabled', 'disabled')
+    enable:
+        document.querySelector('#send-location').removeAttribute('disabled')
+```
+```javascript
+    // public/js/chat.js
+    ...
+    const #sendLocationButton = document.querySelector('#send-location')
+    ...
+    $sendLocationButton.addEventListener('click', () => {
+        ...
+        $sendLocationButton.setAttribute('disabled', 'disabled')
+
+        navigator.geolocation.getCurrentPosition( (pos) => {
+            socket.emit('sendLocation', {
+                ...
+            }, () => {
+                $sendLocationButton.removeAttribute('disabled')
+                console.log('Location shared.')
+            })
+        })
+    })
+```

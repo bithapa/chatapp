@@ -5,6 +5,8 @@ const $messageForm = document.querySelector('#message-form')
 const $messageFormInput = $messageForm.querySelector('input')
 const $messageFormButton = $messageForm.querySelector('button')
 
+const $sendLocationButton = document.querySelector('#send-location')
+
 socket.on('message', (message) => {
     console.log(message)
 })
@@ -13,7 +15,7 @@ $messageForm.addEventListener('submit', (e) => {
     e.preventDefault()
 
     // disable button
-    $messageFormButton.setAttribute('disabled', '')
+    $messageFormButton.setAttribute('disabled', 'disabled')
     // TODO: add some validation here
     const message = e.target.elements.msg.value
     socket.emit('sendMessage', message, (error) => {
@@ -30,11 +32,11 @@ $messageForm.addEventListener('submit', (e) => {
     })
 })
 
-document.querySelector('#send-location').addEventListener('click', () => {
+$sendLocationButton.addEventListener('click', () => {
     if(!navigator.geolocation ){
         return alert('Your browser doesn\'t support Geolocation service.')
     }
-
+    $sendLocationButton.setAttribute('disabled', 'disabled')
     // get the current location
     navigator.geolocation.getCurrentPosition((pos) => {
         // console.log(pos)
@@ -42,6 +44,7 @@ document.querySelector('#send-location').addEventListener('click', () => {
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude
         }, () => {
+            $sendLocationButton.removeAttribute('disabled')
             console.log('Location Shared.')
         })
     })
