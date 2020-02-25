@@ -340,7 +340,7 @@ We now instead want to render this link.
     // set up param callback that acknowledges
     socket.on('sendMessage', (msg, callback) => {
         io.emit('message', msg)
-        callback()
+        callback('Acknowledged.')
     })
     ...
 ```
@@ -355,6 +355,70 @@ We now instead want to render this link.
         socket.emit('sendMessage', message, (serverMessage) => {
             console.log('The message was delivered.', `${serverMessage}`)
         })
+    })
+    ...
+```
+- Acknowledgement allows to use npm module `bad-words` to filter the message for profanity
+- To install: `npm i bad-words@3.0.0`
+- Check for the profanity in the message received from client
+```javascript
+    // index.js
+    ...
+    const Filter = require('bad-words')
+    ...
+    socket.on('sendMessage', (msg, callback) => {
+        const filter = new Filter()
+
+        if (!filter.isProfane(msg)) {
+            return callback('Profanity is not allowed here.')
+        }
+        io.emit('message', msg)
+        callback('Acknowledged.')
+    })
+    ...
+```
+- Change the callback function to incorporate Error
+```javascript
+    // public/js/chat.js
+    ...
+    document.querySelector('#message-form').addEventListener('submit', (e) => {
+        e.preventDefault()
+        const message = e.target.elements.msg.value
+        socket.emit('sendMessage', message, (error) => {
+            if (error) {
+                console.log(error)
+            }
+            console.log('Message Delivered.')
+        })
+    })
+    ...
+```
+- Acknowledgement for Sharing Location
+- set up a client acknowledgement function
+- set up the server to send back the acknowledgement
+- have the client print "Location shared!" when acknowledged
+
+- add a function parameter in 'sendLocation'
+- add callback function in server
+```javascript
+// public/js/chat.js
+    ...
+    navigator.geolocation.getCurrentPosition( (pos) => {
+        socket.emit('sendLocation', {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude
+        }, () => {
+            console.log('Location shared.')
+        })
+    })
+```
+```javascript
+// index.js
+    ...
+    socket.on('sendLocation', (position, callback) => {
+        io.emit('message', `https://www.google.com/maps?q=${position.latitude},${position.longitude}`)
+
+        callback()
     })
     ...
 ```
