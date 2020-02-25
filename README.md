@@ -7,6 +7,7 @@
 - [x] 3. Socket.io Events
 - [x] 4. Broadcasting Events
 - [x] 5. Sharing Location: MDN Geolocation API
+- [x] 6. Socket Acknowledgements!
 ---
 # 0. Files Tree:
 
@@ -288,7 +289,9 @@ In `chatapp/package.json`:
 // public/js/chat.js
     ...
     navigator.geolocation.getCurrentPosition( (pos) => {
-        console.log(position)
+        // Use this to fetch the current position, shown in JSON format
+        // console.log(position)
+
         socket.emit('sendLocation', {
             latitude: pos.coords.latitude,
             longitude: pos.coords.longitude
@@ -302,4 +305,56 @@ In `chatapp/package.json`:
     socket.on('sendLocation', (position) => {
         io.emit('message', `Location: ${position.latitude}, ${position.longitude}`)
     })
+```
+- The query format for Google map's location is `https://www.google.com/maps?q=latitude,longitude`, where `latitude` and `longitude` are actual coordinates.
+We now instead want to render this link.
+```javascript
+// index.js
+    ...
+    socket.on('sendLocation', (position) => {
+        io.emit('message', `https://www.google.com/maps?q=${position.latitude},${position.longitude}`)
+    })
+    ...
+```
+# 6. Socket Acknowledgements!
+- Well acknowledgements are acknowledgements. Basically callback function provided to the event that acknowledge that event was occurred.
+```javascript
+    // public/js/chat.js
+    ...
+    document.querySelector('#message-form').addEventListener('submit', (e) => {
+        e.preventDefault()
+        const message = e.target.elements.msg.value
+        // add the callback acknowledgement
+        socket.emit('sendMessage', message, () => {
+            console.log('The message was delivered.')
+        })
+    })
+    ...
+```
+- Now, with that client expects server to acknowledge this acknowledgement.
+- note that callback can take as many parameter as we want,
+- provide a message 'Acknowledged.' to callback as parameter
+```javascript
+    // index.js
+    ...
+    // set up param callback that acknowledges
+    socket.on('sendMessage', (msg, callback) => {
+        io.emit('message', msg)
+        callback()
+    })
+    ...
+```
+- The parameter sent to `callback()` in server can be fetched in the client side `chat.js` as
+```javascript
+    // public/js/chat.js
+    ...
+    document.querySelector('#message-form').addEventListener('submit', (e) => {
+        e.preventDefault()
+        const message = e.target.elements.msg.value
+        // add the callback acknowledgement
+        socket.emit('sendMessage', message, (serverMessage) => {
+            console.log('The message was delivered.', `${serverMessage}`)
+        })
+    })
+    ...
 ```

@@ -9,7 +9,10 @@ document.querySelector('#message-form').addEventListener('submit', (e) => {
 
     // TODO: add some validation here
     const message = e.target.elements.msg.value
-    socket.emit('sendMessage', message)
+    socket.emit('sendMessage', message, (serverMessage) => {
+        // this call back function is acknowledgement
+        console.log('Message was delivered.', `${serverMessage}`)
+    })
 })
 
 document.querySelector('#send-location').addEventListener('click', () => {

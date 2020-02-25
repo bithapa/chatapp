@@ -24,8 +24,9 @@ io.on('connection', (socket) => {
     socket.emit('message', 'Welcome! Client CONNECTED!')
     socket.broadcast.emit('message', 'A new user has joined.')
 
-    socket.on('sendMessage', (msg) => {
+    socket.on('sendMessage', (msg, callback) => {
         io.emit('message', msg)
+        callback('Acknowledged!')
     })
 
     // on 'disconnect' (built-in)
@@ -35,7 +36,7 @@ io.on('connection', (socket) => {
 
     // event: senLocation
     socket.on('sendLocation', (position) => {
-        io.emit('message', `Location: ${position.latitude}, ${position.longitude}`)
+        io.emit('message', `https://www.google.com/maps?q=${position.latitude},${position.longitude}`)
     })
 
 })
