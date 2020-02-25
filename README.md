@@ -14,6 +14,8 @@
         |-src
         |   |-index.js
         |-public
+        |   |-js
+        |   |  |-chat.js
         |   |-index.html
         |-package-lock.json
         |-package.json
@@ -22,9 +24,9 @@
 ---
 # 1. Setting things up
 
-1. initialize the NodeJS project:
+- initialize the NodeJS project:
     - create chatapp folder and run `npm init`, all the values can be default
-2. Build a Node server:
+- Build a Node server:
 
 ```javascript
     // chatapp/src/index.js:
@@ -49,9 +51,8 @@
     })
 ```
 
-3. Setup `public` directory:
+- Setup `public` directory:
 create `chatapp/public/index.html` file
-
 ```html
     // chatapp/public/index.html
     <!DOCTYPE html>
@@ -68,7 +69,7 @@ create `chatapp/public/index.html` file
     </html>
 ```
 
-4. Setup Script
+- Setup Script
 
 In `chatapp/package.json`:
 
@@ -221,10 +222,30 @@ In `chatapp/package.json`:
     socket.broadcast.emit('message', 'A new user has joined.')
     ...
 ```
-- So far, we have three ways to emit the event from the server:
+- So far, we have three ways a server can emit an event:
 ```
                 socket.emit: to emit the event to the particular connection,
       socket.broadcast.emit: to emit to everyone except itself
                     io.emit: to emit to everyone
 
 ```
+- Send message 'A user has left.' to everyone once the user leaves chat
+
+```javascript
+    // src/index.js
+    io.on('connection', (socket) => {
+        console.log(`Message from Socket connection!`)
+
+        socket.emit('message', 'Welcome! Client CONNECTED!')
+        socket.broadcast.emit('message', 'A new user has joined.')
+
+        socket.on('sendMessage', (msg) => {
+            io.emit('message', msg)
+        })
+
+        // use the built-in event 'disconnect', note it uses `socket` to emit this event
+        socket.on('disconnect', () => {
+            // since we want to let everyone know, we use emit
+            io.emit('message', 'A user has left.')
+        })
+    })

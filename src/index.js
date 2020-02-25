@@ -17,6 +17,7 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 // use express static middleware to setup the server
 app.use(express.static(publicDirectoryPath))
 
+// 'connection' is a built-in event
 io.on('connection', (socket) => {
     console.log(`Message from Socket connection!`)
 
@@ -26,6 +27,12 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', (msg) => {
         io.emit('message', msg)
     })
+
+    // on 'disconnect' (built-in)
+    socket.on('disconnect', () => {
+        io.emit('message', 'A user has left.')
+    })
+
 })
 
 // listening to the port
