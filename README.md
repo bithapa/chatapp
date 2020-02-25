@@ -9,6 +9,8 @@
 - [x] 5. Sharing Location: MDN Geolocation API
 - [x] 6. Socket Acknowledgements!
 - [x] 7. Forms and Button (with Acknowledgements)
+- [x] 8. Rendering Messages with `Mustache`
+
 ---
 # 0. Files Tree:
 
@@ -475,7 +477,7 @@ We now instead want to render this link.
 ```javascript
     // public/js/chat.js
     ...
-    const #sendLocationButton = document.querySelector('#send-location')
+    const $sendLocationButton = document.querySelector('#send-location')
     ...
     $sendLocationButton.addEventListener('click', () => {
         ...
@@ -491,3 +493,10 @@ We now instead want to render this link.
         })
     })
 ```
+# 8. Rendering Messages with `Mustache`
+/[Link](https://links.mead.io/chatlibs) to Libraries./
+- Libraries:
+    1. Mustache
+    2. Moment
+    3. QS
+- import the libraries on index.html
