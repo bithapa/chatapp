@@ -398,8 +398,8 @@ We now instead want to render this link.
 - set up the server to send back the acknowledgement
 - have the client print "Location shared!" when acknowledged
 
-- add a function parameter in 'sendLocation'
-- add callback function in server
+    - add a function parameter in 'sendLocation'
+    - add callback function in server
 ```javascript
 // public/js/chat.js
     ...
