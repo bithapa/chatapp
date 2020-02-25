@@ -8,6 +8,7 @@
 - [x] 4. Broadcasting Events
 - [x] 5. Sharing Location: MDN Geolocation API
 - [x] 6. Socket Acknowledgements!
+- [x] 7. Forms and Button (with Acknowledgements)
 ---
 # 0. Files Tree:
 
@@ -421,4 +422,46 @@ We now instead want to render this link.
         callback()
     })
     ...
+```
+# 7. Forms and Button (with Acknowledgements)
+- Enabling and disabling button between when the message is sent and when the message s received
+- create elements for code efficiency
+- once the message is sent, clear the input field, and add focus cursor
+```
+    disable:
+        document.querySelector('#message-form').querySelector('button').setAttribute('disabled', 'disabled')
+    enable:
+        document.querySelector('#message-form').querySelector('button').removeAttribute('disabled')
+    clear input field:
+        document.querySelector('#message-form').querySelector('input').value = ''
+    set focus:
+        document.querySelector('#message-form').querySelector('input').focus()
+```
+```javascript
+    // public/js/chat.js
+    ...
+    // elements
+    const $messageForm = document.querySelector('#message-form')
+    const $messageFormInput = $messageForm.querySelector('input')
+    const $messageFormButton = $messageForm.querySelector('button')
+    ...
+    $messageForm.addEventListener('submit', (e) => {
+        e.preventDefault
+
+        //disable the form
+        $messageFormButton.setAttribute('disabled', 'disabled')
+        const message = e.target.elements.msg.value
+        socket.emit('sendMessage', message, (error) => {
+            // enable the form
+            $messageFormButton.removeAttribute('disabled')
+            // clear input field
+            $messageFormInput.value = ''
+            // set focus
+            $messageFormInput.focus()
+            if (error) {
+                return console.log(error)
+            }
+            console.log('Message delivered.')
+        })
+    })
 ```
