@@ -10,6 +10,7 @@
 - [x] 6. Socket Acknowledgements!
 - [x] 7. Forms and Button (with Acknowledgements)
 - [x] 8. Rendering Messages with `Mustache`
+- [x] 9. Rendering Location
 
 ---
 # 0. Files Tree:
@@ -530,11 +531,34 @@ We now instead want to render this link.
     // chat.js
     ...
     const $messages = document.querySelector('#messages') // grab the div
-    const messageTemplate = document.querySelector('#message-template').innerHTML // grab the template
+    // grab the template as HTML
+    const messageTemplate = document.querySelector('#message-template').innerHTML
 
     socket.on('message', (msg) => {
         ...
         const html = Mustache.render(messageTemplate, {message: msg})
+        $messages.insertAdjacentHTML('beforeend', html)
+    })
+```
+# 9. Rendering Location
+- This is similar to the rendering message
+```HTML
+    <!-- index.html -->
+    ...
+    <script id="location-message-template" type="text/html">
+        <div>
+            <p><a href="{{url}}" target="_blank">my current location</a><p>
+        </div>
+    </script>
+    ...
+```
+```javascript
+    // chat.js
+    ...
+    const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
+    // location message is emitted at the server index.js
+    socket.on('locationMessage', (locationLink) => {
+        const html = Mustache.render(locationMessageTemplate, {url:locationLink})
         $messages.insertAdjacentHTML('beforeend', html)
     })
 ```

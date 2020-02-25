@@ -11,7 +11,15 @@
         </div>
 
         <script id="message-template" type="text/html">
-            <p>{{message}}</p>
+            <div>
+                <p>{{message}}</p>
+            </div>
+        </script>
+
+        <script id="location-message-template" type="text/html">
+            <div>
+            <p><a href="{{url}}" target="_blank">my current location</a></p>
+            </div>
         </script>
 
         <form id="message-form">
