@@ -11,7 +11,7 @@
 - [x] 7. Forms and Button (with Acknowledgements)
 - [x] 8. Rendering Messages with `Mustache`
 - [x] 9. Rendering Location
-
+- [x] 10. timestamp: Messing with Time
 ---
 # 0. Files Tree:
 
@@ -559,6 +559,116 @@ We now instead want to render this link.
     // location message is emitted at the server index.js
     socket.on('locationMessage', (locationLink) => {
         const html = Mustache.render(locationMessageTemplate, {url:locationLink})
+        $messages.insertAdjacentHTML('beforeend', html)
+    })
+```
+# 10. timestamp: Messing with Time
+- javascript provides some built-in time functionality. This can be tested in the console provided with the web developer tools
+```
+    const now = new Date()
+    now.toString()  // "Tue Feb 25 2020 14:50:51 GMT-0500 (Eastern Standard Time)"
+    now.getDate()   // 25
+    now.getTime()   // 1582660251241 == 50.18 years
+```
+- `getTime()` provides the number of milliseconds since UNIX epic (midnight Jan 1st, 1970). Positive number go into future and negative number go to past from the epic.
+- Display the time of the message: Emit two things-- message and the timestamp
+    - by providing two arguments (message and timestamp) to the event,
+    - OR by providing single object as argument (message and timestamp would be object properties).
+```javascript
+    // index.js
+    ...
+    socket.emit('message', {
+        text: "Welcome! You're connected.",
+        createdAt: new Date().getTime()
+    })
+    ...
+```
+- Create the function that generates the above object (this is because we don't have to type all the code every time we need the object. efficiency!).
+    - create `chatapp/src/utils/messages.js`
+```javascript
+    // src/utils/messages.js
+
+    // the function takes the message `text` as argument and returns an object with
+    // `text` and `timestamp`
+    const generateMessage = (text) => {
+        return {
+            text,
+            createdAt: new Date().getTime()
+        }
+    }
+
+    module.exports = {
+        generateMessage
+    }
+```
+- Now, call the function in server:
+```JavaScript
+    // index.js
+    ...
+    const { generateMessage } = require('./utils/messages')
+    socket.emit('message', generateMessage('Welcome! You\'re connected.'))
+    ...
+```
+- Now, we need to adjust the client side as well
+
+```JavaScript
+    // chat.js
+    ...
+    // msg now is an object
+    //  to render actual message we call msg.txt
+    socket.on('message', (msg) => {
+        console.log(msg)
+        // render msg inside the messageTemplate
+        const html = Mustache.render(messageTemplate, {
+            message: msg.txt
+        })
+        $messages.insertAdjacentHTML('beforeend', html)
+    })
+    ...
+```
+- We can use `generateMessage()` in all the four message emit events in server.
+``` JavaScript
+    // index.js
+    ...
+    // to the users joining
+    socket.emit('message', generateMessage('Welcome!, You\'re connected.'))
+
+    // to all the other users
+    socket.broadcast.emit('message', generateMessage('A new user has joined.'))
+    ...
+    // when the users leaves room
+    socket.on('disconnet', () => {
+        io.emit('message', generateMessage('A user has left.'))
+    })
+    ...
+```
+- Integrate timestamp on the message-template
+```html
+    <!-- index.html -->
+    ...
+    <script id="message-template" type="text/html">
+        <div>
+            <p>{{createdAt}} - {{message}}</p>
+        </div>
+    </script>
+    ...
+```
+- Adjust the object (add timestamp) that is passed into the template.
+- Right now timestamp is just a big number, we need to show this in an understandable manner. That's where `momentjs` (imported earlier as one of the js dependency in index.html) comes to play.
+    - go to [MomentJS](https://momentjs.com/),
+        - go to docs/display,
+    - check the tokens used to format the dates and time by using `moment().format()`,
+    - the timestamp is passed into the `moment()`
+```javascript
+    // chat.js
+
+    socket.on('message', (msg) => {
+        console.log(msg)
+        // render msg inside the messageTemplate
+        const html = Mustache.render(messageTemplate, {
+            message: msg.txt,
+            createdAt: moment(msg.createdAt).format('hh:mm a')
+        })
         $messages.insertAdjacentHTML('beforeend', html)
     })
 ```

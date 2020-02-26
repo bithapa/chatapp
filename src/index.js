@@ -18,36 +18,36 @@ const publicDirectoryPath = path.join(__dirname, '../public')
 // use express static middleware to setup the server
 app.use(express.static(publicDirectoryPath))
 
-// 'connection' is a built-in event
 io.on('connection', (socket) => {
     console.log(`Message from Socket connection!`)
 
-    socket.emit('message', 'Welcome! Client CONNECTED!')
-    socket.broadcast.emit('message', 'A new user has joined.')
+    // to the user joining
+    socket.emit('message', {
+        text: "Welcome! You're connected.",
+        createdAt: new Date().getTime()
+    })
+    socket.broadcast.emit('message', 'A new user has joined.') // to everyone else
 
     socket.on('sendMessage', (msg, callback) => {
         const filter = new Filter()
         if (filter.isProfane(msg)) {
             return callback('Profanity is not allowed here.')
         }
-        io.emit('message', msg)
+        io.emit('message', msg) // emit message to all the connected users
         callback()
     })
 
-    // on 'disconnect' (built-in)
-    socket.on('disconnect', () => {
+    socket.on('disconnect', () => { // emit when someone leaves the chat room
         io.emit('message', 'A user has left.')
     })
 
-    // event: senLocation
     socket.on('sendLocation', (position, callback) => {
-        io.emit('message', `https://www.google.com/maps?q=${position.latitude},${position.longitude}`)
+        io.emit('locationMessage', `https://www.google.com/maps?q=${position.latitude},${position.longitude}`)
         callback()
     })
 
 })
 
-// listening to the port
 server.listen(port, () => {
     console.log(`Server is up on port ${port}!`)
 })
