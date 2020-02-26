@@ -18,6 +18,8 @@
 ```
     chatapp
         |-src
+        |   |-utils
+        |   |   |-messages.js
         |   |-index.js
         |-public
         |   |-js
@@ -672,3 +674,4 @@ We now instead want to render this link.
         $messages.insertAdjacentHTML('beforeend', html)
     })
 ```
+*[Note: The timestamp can be added to location messages in similar way.]*

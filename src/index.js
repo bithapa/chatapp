@@ -4,6 +4,8 @@ const path = require('path') // node module
 const http = require('http')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
+const { generateMessage } = require('./utils/messages')
+const {generateLocationMessage } = require('./utils/messages');
 
 const app = express() // initialize the express app
 const server = http.createServer(app)
@@ -22,27 +24,24 @@ io.on('connection', (socket) => {
     console.log(`Message from Socket connection!`)
 
     // to the user joining
-    socket.emit('message', {
-        text: "Welcome! You're connected.",
-        createdAt: new Date().getTime()
-    })
-    socket.broadcast.emit('message', 'A new user has joined.') // to everyone else
+    socket.emit('message', generateMessage('Welcome! You\'re connected.'))
+    socket.broadcast.emit('message', generateMessage('A new user has joined.')) // to everyone else
 
-    socket.on('sendMessage', (msg, callback) => {
+    socket.on('sendMessage', (message, callback) => {
         const filter = new Filter()
-        if (filter.isProfane(msg)) {
+        if (filter.isProfane(message)) {
             return callback('Profanity is not allowed here.')
         }
-        io.emit('message', msg) // emit message to all the connected users
+        io.emit('message', generateMessage(message)) // emit message to all the connected users
         callback()
     })
 
     socket.on('disconnect', () => { // emit when someone leaves the chat room
-        io.emit('message', 'A user has left.')
+        io.emit('message', generateMessage('A user has left.'))
     })
 
     socket.on('sendLocation', (position, callback) => {
-        io.emit('locationMessage', `https://www.google.com/maps?q=${position.latitude},${position.longitude}`)
+        io.emit('locationMessage', generateLocationMessage(position))
         callback()
     })
 
