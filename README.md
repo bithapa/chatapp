@@ -919,7 +919,7 @@ We now instead want to render this link.
             callback()
         })
 ```
-    ```JavaScript
+    ```javascript
                 // Note: {username, room} can be destructured as:
 
                     socket.on('join', (options, callback ) => {
