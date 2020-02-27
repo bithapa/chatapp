@@ -4,8 +4,13 @@ const path = require('path') // node module
 const http = require('http')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
-const { generateMessage } = require('./utils/messages')
-const {generateLocationMessage } = require('./utils/messages');
+const { generateMessage, generateLocationMessage } = require('./utils/messages')
+// const { generateLocationMessage } = require('./utils/messages');
+const {
+    addUser,
+    removeUser,
+    getUser,
+    getUsersInRoom } = require('./utils/users');
 
 const app = express() // initialize the express app
 const server = http.createServer(app)
@@ -14,7 +19,7 @@ const io = socketio(server)
 // calls from environment variable or port 3000
 const port = process.env.PORT || 3000 // enable the port address
 
-// main folder/source to render
+// path to client side
 const publicDirectoryPath = path.join(__dirname, '../public')
 
 // use express static middleware to setup the server
@@ -23,15 +28,21 @@ app.use(express.static(publicDirectoryPath))
 io.on('connection', (socket) => {
     console.log(`Message from Socket connection!`)
 
-    socket.on('join', ( { username, room} ) => {
-        // join() is a socket method allows you to join the specifc chat room
-        socket.join(room)
+    socket.on('join', ( { username, room}, callback ) => {
+        const {user, error} = addUser({id: socket.id, username, room})
+        if( error ) {
+            return callback(error)
+        }
+        // join() is a socket method that
+        // allows you to join the specifc chat room
+        socket.join(user.room)
 
         // to all the user joining the specific room
         socket.emit('message', generateMessage('Welcome! You\'re connected.'))
         // to everyone else in a specifc room: to()
-        socket.broadcast.to(room)
-                .emit('message',generateMessage(`${username} has joined.`))
+        socket.broadcast.to(user.room)
+                .emit('message',generateMessage(`${user.username} has joined.`))
+        callback()
     })
 
     socket.on('sendMessage', (message, callback) => {

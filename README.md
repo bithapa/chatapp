@@ -893,3 +893,48 @@ We now instead want to render this link.
 ```
 - *Don't forget to export the functions*
 # 16. Tracking Users joining and leaving
+- Now we have `addUser` we use this first.
+    - we can get either `error` or `user` from the `addUser()`
+    - if `error`, we send the acknowledgement to the client through callback
+```javascript
+    // index.js
+    ...
+    io.on('connection', (socket) => {
+        console.log('Message from Socket connection!')
+
+        // add callback
+        socket.on('join', ( { username, room}, callback ) => {
+            // add the user
+            const {user, error} = addUser({id: socket.id, username, room})
+            if (error) {
+                return callback(error)
+            }
+
+            socket.join(user.room)
+
+            socket.emit('message', generateMessage('Welcome! You\'re connected.'))
+            socket.broadcast.to(user.room)
+                    .emit('message',generateMessage(`${user.username} has joined.`))
+            // add callback
+            callback()
+        })
+```
+    ```JavaScript
+                // Note: {username, room} can be destructured as:
+
+                    socket.on('join', (options, callback ) => {
+                        // add the user
+                        const {user, error} = addUser({id: socket.id, ...option})
+                        if (error) {
+                            return callback(error)
+                        }
+    ```
+
+```javascript
+    // public/chat.js
+    ...
+    // add the callback in case of error
+    socket.emit('join', { username, room }, (error) => {
+
+    })
+```
