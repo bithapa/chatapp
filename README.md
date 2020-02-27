@@ -803,3 +803,49 @@ We now instead want to render this link.
 # 14. Storing Users: Part I
 - In order to send the message to specific room, we need to to keep track of which users are active in which rooms.
 - Note that the objects properties returned by the qs parser, `{ username, room }`, as of now are only accessible in the event 'join.'
+
+    - create 'src/utils/users.js'
+    -  the methods :
+        ```
+            users[]
+
+            addUser()
+            removeUser()
+        ```
+
+```JavaScript
+    // src/utils/users.js
+
+    const users = []
+
+
+    // takes a user object {id,username,room}, validates,
+    // stores in the array users[], and returns the object
+
+    const addUser = ( { id, username, room }) => {
+        // Clean the input
+        username = username.trim().toLowerCase()
+        room = room.trim().toLowerCase()
+
+        // validation
+
+        if ( !username || !room ) {
+            return {
+                error: 'Username and room are required!'
+            }
+        }
+
+        // check for existing user
+        // iterates over the users[] array and checks
+        // if username and room match
+        const existingUser = users.find( (user_in_users) => {
+            return user_in_users.username === username && user_in_users.room === room
+        })
+
+        // store user
+        const user = { id, username, room }
+        users.push(user)
+
+        return { user }
+    }
+```
