@@ -15,17 +15,18 @@
 - [x] 11. Styling the Chat App (`css`)
 - [x] 12. Adding a login page (`chat` becomes `index`!)
 - [x] 13. Sockets.io Rooms
-- [x] 14. Storing Users: Part I
-- [x] 15. Storing Users: Part II
+- [x] 14. Storing Users: Part I (`JavaScript` functions)
+- [x] 15. Storing Users: Part II (more `JavaScript` functions)
+- [x] 16. Tracking Users joining and leaving
 ---
 # 0. Files Tree:
 ```
     chatapp
         |-src
+        |   |-index.js
         |   |-utils
         |   |   |-messages.js
-        |   |-index.js
-        |   |-users.js
+        |   |   |-users.js
         |-public
         |   |-css
         |   |  |-styles.css
@@ -40,7 +41,6 @@
         |-package.json
         |-README.json
 ```
----
 # 1. Setting things up
 
 - initialize the NodeJS project:
@@ -69,7 +69,6 @@
         console.log(`Server is up on port ${port}!`)
     })
 ```
-
 - Setup `public` directory:
 create `chatapp/public/index.html` file
 ```html
@@ -87,11 +86,8 @@ create `chatapp/public/index.html` file
         </body>
     </html>
 ```
-
 - Setup Script
-
 In `chatapp/package.json`:
-
 ```
     "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1",
@@ -100,14 +96,12 @@ In `chatapp/package.json`:
     }
 ```
 - install `nodemon` as development dependency: `npm i nodemon@1.18.7 --save-dev`
-
 ```
     Commands:
                     to run the project:     npm run start
             to run in development mode:     npm run dev
 
 ```
----
 # 2. WebSockets: Full Duplex Communication
 - bidirectional communication between the client and the server
 - webSocket protocol is different from http
@@ -134,7 +128,6 @@ In `chatapp/package.json`:
         console.log(`Server is up on port ${port}!`)
     })
 ```
-
 - Server-Client connection for webSocket:
     - in `public/index.html`
 ```html
@@ -154,7 +147,6 @@ In `chatapp/package.json`:
     // public/js/chat.js
     io()    // provided by the socket.io script in the index.html
 ```
----
 # 3. Socket.io Events
 ??? *need to study more on this*
 - when some events occurs (for eg. 'connection') either on client side or on server side, we can ask socket to run certain task (for eg. sending a message)
@@ -172,7 +164,6 @@ In `chatapp/package.json`:
     })
     ...
 ```
-
 ```javascript
     // public/js/chat.js
     const socket = io()
@@ -181,7 +172,6 @@ In `chatapp/package.json`:
         console.log(message)
     })
 ```
-
 - Now, create a form to get the input message and have that rendered on console
 ```html
     <!--public/index.html-->
@@ -807,12 +797,14 @@ We now instead want to render this link.
 - Note that the objects properties returned by the qs parser, `{ username, room }`, as of now are only accessible in the event 'join.'
 
     - create 'src/utils/users.js'
-    -  the methods :
+    -  methods implemented:
         ```
             users[]
 
             addUser()
             removeUser()
+            getUser()
+            getUsersInRoom()
         ```
 ```JavaScript
     // src/utils/users.js
@@ -876,3 +868,28 @@ We now instead want to render this link.
         }
     }
 ```
+# 15. Storing Users: Part II (more `JavaScript` functions)
+- Here we implement
+    ```
+        getUser()
+        getUsersInRoom()
+    ```
+```JavaScript
+    // src/utils/users.js
+    ...
+    // accepts the id and returns
+    // the user object with that id
+    const getUser = (id) => {
+        // check if the user exist or not
+        return users.find((user) => user.id === id
+        )
+    }
+
+    // returns all the users object in the given room
+    const getUsersInRoom = (room) => {
+        return users.filter((user) => user.room === room)
+    }
+    ...
+```
+- *Don't forget to export the functions*
+# 16. Tracking Users joining and leaving

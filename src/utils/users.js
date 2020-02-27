@@ -2,13 +2,20 @@
 users[]
     - addUser()
     - removeUser()
+    - getUser()
+    - getUsersInRoom()
 */
 
 const users = []
 
+// function: addUser()
+// @param:
+//      id:         num/int
+//      username:   string
+//      room:       string
 // takes a user object {,,}, cleans and validates the data and if the user
 // doesn't exist already, stores in the users[], and
-// returns the same object
+// returns the same user object
 const addUser = ( { id, username, room} ) => {
     // clean the data
     username = username.trim().toLowerCase()
@@ -40,7 +47,8 @@ const addUser = ( { id, username, room} ) => {
 }
 
 // function: removeUser(id)
-// removes a user with the given id, and returns the removed user object
+// removes a user with the given id,
+// and returns the removed user object
 const removeUser = (id) => {
     // iterate over the users[] to find the matching user
     // index = -1 if not found, else 1
@@ -58,19 +66,38 @@ const removeUser = (id) => {
     }
 }
 
-const user1 = {
-    id: 1,
-    username: 'bitm',
-    room: 'ysuVB'
+// function: getUser(id)
+//  @param:
+//      id: string
+// returns the user object of given id
+const getUser = (id) => {
+    const u = users.find((user) => user.id === id)
+    if (!u) {
+        return {
+            error: 'User doesn\'t exist.'
+        }
+    }
+    return u
 }
-const user2 = {
-    id: 2,
-    username: 'obama',
-    room: 'white house'
+
+// funtion: getUsersInRoom(room)
+//  @param:
+//      room: string
+// returns all the users object of given room
+const getUsersInRoom = (room) => {
+    room = room.trim().toLowerCase()
+    const u = users.filter((user) => user.room === room)
+    if (u.length == 0) {
+        return {
+            error: 'Room doesn\'t exist.'
+        }
+    }
+    return u
 }
-addUser(user1)
-addUser(user2)
-console.log(users)
-const result = removeUser(2)
-console.log('removed user: ', result)
-console.log('after removal: ', users)
+
+module.exports = {
+        addUser,
+        removeUser,
+        getUser,
+        getUsersInRoom
+}
