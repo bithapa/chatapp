@@ -23,9 +23,15 @@ app.use(express.static(publicDirectoryPath))
 io.on('connection', (socket) => {
     console.log(`Message from Socket connection!`)
 
-    // to the user joining
-    socket.emit('message', generateMessage('Welcome! You\'re connected.'))
-    socket.broadcast.emit('message', generateMessage('A new user has joined.')) // to everyone else
+    socket.on('join', ( { username, room} ) => {
+        // join() is a socket method allows you to join the specifc chat room
+        socket.join(room)
+
+        // to all the user joining the specific room
+        socket.emit('message', generateMessage('Welcome! You\'re connected.'))
+        // to everyone else in a specifc room: to()
+        socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined.`))
+    })
 
     socket.on('sendMessage', (message, callback) => {
         const filter = new Filter()

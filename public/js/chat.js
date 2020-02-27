@@ -11,6 +11,11 @@ const $messages = document.querySelector('#messages')
 const messageTemplate = document.querySelector('#message-template').innerHTML
 const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
 
+// qs parse of the url search string
+    // "?username=bitm&room=VB2020"
+// returns username and the room
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true})
+
 socket.on('message', (msg) => {
     console.log(msg)
     // render msg object inside the messageTemplate
@@ -69,3 +74,5 @@ $sendLocationButton.addEventListener('click', () => {
     })
 
 })
+
+socket.emit('join', { username, room })

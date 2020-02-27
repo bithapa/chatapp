@@ -15,6 +15,7 @@
 - [x] 11. Styling the Chat App (`css`)
 - [x] 12. Adding a login page (`chat` becomes `index`!)
 - [x] 13. Sockets.io Rooms
+- [x] 14. Storing Users: Part I
 ---
 # 0. Files Tree:
 ```
@@ -744,3 +745,61 @@ We now instead want to render this link.
 # 12. Adding a login page (`chat` becomes `index`!)
 - For this, we want our main index page to be a log in form where users can log in. To do this create a new `/public/chat.html` file and and move all the code from `index.html` to `chat.html`. `index.html` is modified to display a user's log in form.
 # 13. Sockets.io Rooms
+- when you log in as `bitm` in room `VB2020` you get the chat room link that is automatically generated as `http://localhost:3000/chat.html?username=bitm&room=VB2020`. In order to setup the chatroom that multiple users can access to we need to parse the string after the main url i.e. `?username=bitm&room=VB2020`.
+- To check this in console
+```
+    location.origin:    "http://localhost:3000"
+    location.search:    "?username=bitm&room=VB2020"
+```
+- We'll be using `qs.js` (query string) to parse the string.
+- To Parse:
+    - `{ ignoreQueryPrefix: true }` removes the `?` sign in front of the string
+- Once we have our `username` and `room` set, we can emit new event for joining a specific room.
+```javascript
+    // chat.js
+    ...
+    // options
+    // returns strings username and room
+    const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true})
+    ...
+    // emit the event 'join'
+    socket.emit('join', {username, room})
+```
+- We've just parsed the string and get username and room as object. We've emitted an event called 'join' with those arguments.
+- Now, in the server side set up a listener for this event.
+    - To join the individual chat room, use Socket' join method that can only be used in server: `socket.join()`. This gives access to emitting any events to just this specific room.
+    - Here, with rooms, we introduce two more methods of emitting the message
+    ```
+                    socket.emit() - to emit the event to the particular connection,
+          socket.broadcast.emit() - to emit to everyone except itself
+                        io.emit() - to emit to everyone
+
+                     io.to.emit() - to everyone in a specific chatroom
+       socket.broadcast.to.emit() - to everyone except itself in a specific chatroom
+    ```
+    - Remember the two methods for 'message' event: `socket.emit()` and `socket.broadcast.emit()`; since we are incorporating room now we want to modify this methods with `.to.emit()` and put them inside the `join` event.
+
+```javascript
+    // server.js
+
+    socket.on('join', ({username, room}) => {
+        socket.join(room)
+
+        // modified version of message events with .to.emit()
+
+        // the first one is fine because it's emitting the message to specific socket
+        socket.emit('message', generateMessage('Welcome!You\'re connected.'))
+        // For this, we need to add .to.emit(). Otherwise, it will send message to everyone
+        //regardless of what room they are in
+        socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined.`))
+    })
+```
+- So far
+    - you can join separate rooms,
+    - when a user logs in a room, everyone else except the user get the message saying `${username} has joined.`
+    - But,
+        - while sending messages message goes to all the active rooms, instead of a specific chatroom
+- Let's fix this.
+# 14. Storing Users: Part I
+- In order to send the message to specific room, we need to to keep track of which users are active in which rooms.
+- Note that the objects properties returned by the qs parser, `{ username, room }`, as of now are only accessible in the event 'join.'
