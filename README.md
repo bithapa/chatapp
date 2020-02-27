@@ -16,6 +16,7 @@
 - [x] 12. Adding a login page (`chat` becomes `index`!)
 - [x] 13. Sockets.io Rooms
 - [x] 14. Storing Users: Part I
+- [x] 15. Storing Users: Part II
 ---
 # 0. Files Tree:
 ```
@@ -24,6 +25,7 @@
         |   |-utils
         |   |   |-messages.js
         |   |-index.js
+        |   |-users.js
         |-public
         |   |-css
         |   |  |-styles.css
@@ -812,7 +814,6 @@ We now instead want to render this link.
             addUser()
             removeUser()
         ```
-
 ```JavaScript
     // src/utils/users.js
 
@@ -821,7 +822,6 @@ We now instead want to render this link.
 
     // takes a user object {id,username,room}, validates,
     // stores in the array users[], and returns the object
-
     const addUser = ( { id, username, room }) => {
         // Clean the input
         username = username.trim().toLowerCase()
@@ -841,11 +841,38 @@ We now instead want to render this link.
         const existingUser = users.find( (user_in_users) => {
             return user_in_users.username === username && user_in_users.room === room
         })
+        if ( existingUser ) {
+            return {
+                error: 'Username already in use!'
+            }
+        }
 
         // store user
         const user = { id, username, room }
         users.push(user)
 
         return { user }
+    }
+
+    // removing the user with it's id
+    const removeUser = (id) => {
+        // iterate over the users[] array and
+        // get the index of the user with given id
+        // shorthand: const index = users.findIndex( (user) => user.id === id)
+        // returns -1 if not found
+        const index = users.findIndex( (user) => {
+            return user.id === id
+        })
+
+        if ( index != -1) {
+            // users.splice(index, 1) is an array of objects that are
+            // removed from the users[] array; however, since we are removing
+            // only one `(index, 1)` object [o] is provided at the end
+            return users.splice(index, 1)[0]
+        }
+
+        return {
+            error: 'User doesn\'t exist!'
+        }
     }
 ```

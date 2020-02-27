@@ -30,7 +30,8 @@ io.on('connection', (socket) => {
         // to all the user joining the specific room
         socket.emit('message', generateMessage('Welcome! You\'re connected.'))
         // to everyone else in a specifc room: to()
-        socket.broadcast.to(room).emit('message', generateMessage(`${username} has joined.`))
+        socket.broadcast.to(room)
+                .emit('message',generateMessage(`${username} has joined.`))
     })
 
     socket.on('sendMessage', (message, callback) => {
@@ -38,11 +39,13 @@ io.on('connection', (socket) => {
         if (filter.isProfane(message)) {
             return callback('Profanity is not allowed here.')
         }
-        io.emit('message', generateMessage(message)) // emit message to all the connected users
+        // emit message to all the connected users
+        io.emit('message', generateMessage(message))
         callback()
     })
 
-    socket.on('disconnect', () => { // emit when someone leaves the chat room
+    socket.on('disconnect', () => {
+        // emit when someone leaves the chat room
         io.emit('message', generateMessage('A user has left.'))
     })
 

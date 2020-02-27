@@ -9,7 +9,9 @@ const $messages = document.querySelector('#messages')
 
 // Templates
 const messageTemplate = document.querySelector('#message-template').innerHTML
-const locationMessageTemplate = document.querySelector('#location-message-template').innerHTML
+const locationMessageTemplate = document
+                                .querySelector('#location-message-template')
+                                .innerHTML
 
 // qs parse of the url search string
     // "?username=bitm&room=VB2020"
