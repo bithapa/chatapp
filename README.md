@@ -3,7 +3,7 @@
 ## TOC
 - [x] 0. Files Tree
 - [x] 1. Setting thins up!
-- [x] 2. WebSockets: Full Duplex Communication
+- [x] 2. WebSockets protocols: Full Duplex Communication
 - [x] 3. Socket.io Events
 - [x] 4. Broadcasting Events
 - [x] 5. Sharing Location: MDN Geolocation API
@@ -11,10 +11,12 @@
 - [x] 7. Forms and Button (with Acknowledgements)
 - [x] 8. Rendering Messages with `Mustache`
 - [x] 9. Rendering Location
-- [x] 10. timestamp: Messing with Time
+- [x] 10. timestamp: Messing with Time and `MomentJS`
+- [x] 11. Styling the Chat App (`css`)
+- [x] 12. Adding a login page (`chat` becomes `index`!)
+- [x] 13. Sockets.io Rooms
 ---
 # 0. Files Tree:
-
 ```
     chatapp
         |-src
@@ -22,9 +24,15 @@
         |   |   |-messages.js
         |   |-index.js
         |-public
+        |   |-css
+        |   |  |-styles.css
+        |   |  |-styles.min.css
+        |   |-img
+        |   |  |-favicon.png
         |   |-js
         |   |  |-chat.js
         |   |-index.html
+        |   |-chat.html
         |-package-lock.json
         |-package.json
         |-README.json
@@ -675,3 +683,64 @@ We now instead want to render this link.
     })
 ```
 *[Note: The timestamp can be added to location messages in similar way.]*
+# 11. Styling the Chat App (`css`)
+- import the stylesheets to html
+- Note that `styles.min.css` runs faster than the `styles.css`
+    - this will change the style of the chatapp in some way
+```HTML
+    <!-- index.html -->
+    <head>
+        ...
+        <link rel="icon" href="/img/favicon.png">
+        <link rel="stylesheet" href="/css/styles.min.css">
+    </head>
+```
+- Now to style the `<body >` of the the Chat app, create a `<div >`, inside which there will be two more `<div >`s: `chat__sidebar` (for sidebar) and `chat__main` (for main messaging section).
+    - move the messaging section into the `chat__main` div
+- More adjustments: make the other adjustments as shown below.
+```HTML
+    <!-- index.html -->
+    ...
+    <body>
+        <div class="chat">
+            <div class="chat__sidebar">
+
+            </div>
+
+            <div class="chat__main">
+                <div id="messages" class="chat__messages">
+                </div>
+
+                <div class="compose">
+                    <form id="message-form">
+                        <input name="msg" placeholder="Message" /> <!--input-->
+                        <button>Send</button> <!--button-->
+                    </form>
+                    <button id="send-location">Send Location</button>
+                </div>
+            </div>
+        </div>
+
+        <script id="message-template" type="text/html">
+            <div class="message">
+                <p>
+                    <span class="message__name">User_name</span>
+                    <span class="message__meta">{{createdAt}}</span>
+                </p>
+                <p>{{message}}</p>
+            </div>
+        </script>
+
+        <script id="location-message-template" type="text/html">
+            <div class="message">
+                <p>
+                    <span class="message__name">User_name</span>
+                    <span class="message__meta">{{createdAt}}</span>
+                </p>
+                <p><a href="{{url}}" target="_blank">my current location</a></p>
+            </div>
+        </script>
+```
+# 12. Adding a login page (`chat` becomes `index`!)
+- For this, we want our main index page to be a log in form where users can log in. To do this create a new `/public/chat.html` file and and move all the code from `index.html` to `chat.html`. `index.html` is modified to display a user's log in form.
+# 13. Sockets.io Rooms
