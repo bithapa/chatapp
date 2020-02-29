@@ -982,9 +982,9 @@ We now instead want to render this link.
 
 
 # `don't fucking write` roon `instead of` room `!!!!!!!!!!`
-# [x] 18. Rendering User List
+# 18. Rendering User List
 - left
-# [x] 19. Autoscrolling
+# 19. Autoscrolling
 
 ```JavaScript
 
