@@ -897,11 +897,10 @@ We now instead want to render this link.
     - we can get either `error` or `user` from the `addUser()`
     - if `error`, we send the acknowledgement to the client through callback
 ```javascript
-    // index.js
+    // src/index.js
     ...
     io.on('connection', (socket) => {
         console.log('Message from Socket connection!')
-
         // add callback
         socket.on('join', ( { username, room}, callback ) => {
             // add the user
@@ -918,16 +917,20 @@ We now instead want to render this link.
             // add callback
             callback()
         })
+    })
 ```
+
 ```javascript
                 // Note: {username, room} can be destructured as:
 
                     socket.on('join', (options, callback ) => {
                         // add the user
-                        const {user, error} = addUser({id: socket.id, ...option})
+                        const {user, error} = addUser({id: socket.id, ...options})
                         if (error) {
                             return callback(error)
                         }
+                    ...
+                    })
 ```
 
 ```javascript
@@ -936,5 +939,30 @@ We now instead want to render this link.
     // add the callback in case of error
     socket.emit('join', { username, room }, (error) => {
 
+    })
+```
+- Now we want to remove the user from the room once the user disconnects, but note we want to emit the message only when an actual user disconnects
+```javascript
+    // index.js
+    ...
+    socket.on('disconnect', () => {
+        const user =  removeUser(socket.id)
+
+        if ( user ) {
+            io.to(user.room).emit('message', `${user.username} has left!`)
+        }
+    })
+    ...
+```
+- Now we can also handle errors when there is error such as two same username joining the room. This is done with the callback function at the client side.
+    - If there is error we show what went wrong and we redirect the user to the home page using `location.href`
+```javascript
+    // public/chat.js
+    ...
+    socket.emit('join', {username, room}, ( error ) => {
+        if ( error ) {
+            alert(error)
+            location.href = '/'
+        }
     })
 ```

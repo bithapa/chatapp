@@ -56,8 +56,9 @@ io.on('connection', (socket) => {
     })
 
     socket.on('disconnect', () => {
+        const user = removeUser(socket.id)
         // emit when someone leaves the chat room
-        io.emit('message', generateMessage('A user has left.'))
+        io.to(user.room).emit('message', generateMessage(`${user.username} has left.`))
     })
 
     socket.on('sendLocation', (position, callback) => {
