@@ -1016,3 +1016,10 @@ We now instead want to render this link.
     ...
 ```
 # 20. Deployment
+- Create Heroku Account
+- Install the Heroku CLI
+- run `heroku login`
+- setup ssh to securely integrate the codes:
+    - `heroku keys:add`
+- `git remote` checks the remote
+- `git push heroku master`
