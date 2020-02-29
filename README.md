@@ -18,6 +18,11 @@
 - [x] 14. Storing Users: Part I (`JavaScript` functions)
 - [x] 15. Storing Users: Part II (more `JavaScript` functions)
 - [x] 16. Tracking Users joining and leaving
+- [x] 17. Sending messages to rooms
+- [x] 18. Rendering User List
+- [x] 19. Autoscrolling
+- [x] 20. Deployment
+
 ---
 # 0. Files Tree:
 ```
@@ -966,3 +971,48 @@ We now instead want to render this link.
         }
     })
 ```
+# 17. Sending messages to rooms
+- use `getUser(socket.id)` to get the user and use `to(user.room)` in events `sendMessage` and `sendLocation`.
+- Display the name of the users in the chatroom:
+    - Note in `generateMessage()` and `generateLocationMessage()` function in `messages.js` the only one argument passed,
+    - add another argument `username` on both,
+    - access `username` in index and chat,
+    - modify both `generateMessage()` and `generateLocationMessage()`,
+    - in case of system send message passed in `admin` instead of `username`
+
+
+# `don't fucking write` roon `instead of` room `!!!!!!!!!!`
+# [x] 18. Rendering User List
+- left
+# [x] 19. Autoscrolling
+
+```JavaScript
+
+    // Public/js/chat.js
+    ...
+    const autoScroll = () => {
+        // new message element
+        const $newMessage = $messages.lastElementChild
+
+        // Height of the new Message
+        const newMessageStyles = getComputedStyle($newMessage)
+        // console.log(newMessageStyles)
+        const newMessageMargin = parseInt(newMessageStyles.marginBottom)
+        const newMessageHeight = $newMessage.offsetHeight + newMessageMargin
+
+        // visible height
+        const visibleHeight = $messages.offsetHeight
+
+        // Height of message container
+        const containerHeight = $messages.scrollHeight
+
+        // How far have I scrolled?
+        const scrollOffset = $messages.scrollTop + visibleHeight
+
+        if (containerHeight - newMessageHeight <= scrollOffset) {
+            $messages.scrollTop = $messages.scrollHeight
+        }
+    }
+    ...
+```
+# 20. Deployment

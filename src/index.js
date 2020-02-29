@@ -5,12 +5,7 @@ const http = require('http')
 const socketio = require('socket.io')
 const Filter = require('bad-words')
 const { generateMessage, generateLocationMessage } = require('./utils/messages')
-// const { generateLocationMessage } = require('./utils/messages');
-const {
-    addUser,
-    removeUser,
-    getUser,
-    getUsersInRoom } = require('./utils/users');
+const { addUser, removeUser, getUser, getUsersInRoom } = require('./utils/users');
 
 const app = express() // initialize the express app
 const server = http.createServer(app)
@@ -28,41 +23,55 @@ app.use(express.static(publicDirectoryPath))
 io.on('connection', (socket) => {
     console.log(`Message from Socket connection!`)
 
-    socket.on('join', ( { username, room}, callback ) => {
-        const {user, error} = addUser({id: socket.id, username, room})
+    socket.on('join', ( options, callback ) => {
+        // options = {username, room}
+        const {error, user} = addUser({ id: socket.id, ...options })
         if( error ) {
             return callback(error)
         }
-        // join() is a socket method that
-        // allows you to join the specifc chat room
+        // join() is a socket method that allows you to join the specifc chat room
         socket.join(user.room)
 
         // to all the user joining the specific room
-        socket.emit('message', generateMessage('Welcome! You\'re connected.'))
+        socket.emit('message', generateMessage('admin', 'Welcome!'))
         // to everyone else in a specifc room: to()
-        socket.broadcast.to(user.room)
-                .emit('message',generateMessage(`${user.username} has joined.`))
+        socket.broadcast.to(user.room).emit('message', generateMessage('admin', `${user.username} has joined.`))
+
+        io.to(user.room).emit('roomData', {
+            room: user.room,
+            users: getUsersInRoom(user.room)
+        })
         callback()
     })
 
     socket.on('sendMessage', (message, callback) => {
         const filter = new Filter()
+        const user = getUser(socket.id)
+
         if (filter.isProfane(message)) {
             return callback('Profanity is not allowed here.')
         }
         // emit message to all the connected users
-        io.emit('message', generateMessage(message))
+        io.to(user.room).emit('message', generateMessage(user.username, message))
         callback()
     })
 
     socket.on('disconnect', () => {
         const user = removeUser(socket.id)
         // emit when someone leaves the chat room
-        io.to(user.room).emit('message', generateMessage(`${user.username} has left.`))
+        if (user) {
+            io.to(user.room).emit('message', generateMessage('admin', `${user.username} has left.`))
+            io.to(user.room).emit('roomData',  {
+                room: user.room,
+                users: getUsersInRoom(user.room)
+            })
+        }
     })
 
     socket.on('sendLocation', (position, callback) => {
-        io.emit('locationMessage', generateLocationMessage(position))
+        const user = getUser(socket.id)
+
+        io.to(user.room).emit('locationMessage', generateLocationMessage(user.username, position))
         callback()
     })
 

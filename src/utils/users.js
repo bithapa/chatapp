@@ -32,7 +32,7 @@ const addUser = ( { id, username, room} ) => {
     const userExists = users.find( (user) => {
         return user.username === username && user.room === room
     })
-    if( userExists ) {
+    if(userExists) {
         return {
             error: 'Username already in use!'
         }
@@ -40,7 +40,7 @@ const addUser = ( { id, username, room} ) => {
 
     // store the data
     const user = { id, username, room }
-    users.push( user )
+    users.push(user)
 
     // return the user object
     return { user }
@@ -60,10 +60,9 @@ const removeUser = (id) => {
         // only one `(index, 1)` object [o] is provided at the end
         return users.splice(index, 1)[0]
     }
-
-    return {
-        error: 'User doesn\'t exist!'
-    }
+    // return {
+    //     error: 'User doesn\'t exist!'
+    // }
 }
 
 // function: getUser(id)
@@ -71,13 +70,8 @@ const removeUser = (id) => {
 //      id: string
 // returns the user object of given id
 const getUser = (id) => {
-    const u = users.find((user) => user.id === id)
-    if (!u) {
-        return {
-            error: 'User doesn\'t exist.'
-        }
-    }
-    return u
+    // returns undefined if not matched
+    return users.find((user) => user.id === id)
 }
 
 // funtion: getUsersInRoom(room)
@@ -86,14 +80,22 @@ const getUser = (id) => {
 // returns all the users object of given room
 const getUsersInRoom = (room) => {
     room = room.trim().toLowerCase()
-    const u = users.filter((user) => user.room === room)
-    if (u.length == 0) {
-        return {
-            error: 'Room doesn\'t exist.'
-        }
-    }
-    return u
+    return users.filter((user) => user.room === room)
 }
+
+// const user1 = {
+//     id: 1,
+//     username: 'user1',
+//     room: 'room1'
+// }
+// const user2 = {
+//     id: 2,
+//     username: 'user2',
+//     room: 'room1'
+// }
+// addUser(user1)
+// addUser(user2)
+// console.log(getUsersInRoom('Room1'))
 
 module.exports = {
         addUser,
